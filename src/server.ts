@@ -16,13 +16,16 @@ const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
 const io = new Server(httpServer, {
     cors: {
-        origin: [frontendUrl], // Allow frontend
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
+        origin: frontendUrl,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+        credentials: true
     }
 });
 
 app.use(cors({
-    origin: frontendUrl
+    origin: frontendUrl,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
 }));
 app.use(express.json());
 
