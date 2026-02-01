@@ -1,4 +1,25 @@
-import { PrismaClient, Category } from '@prisma/client';
+// import { PrismaClient, Category } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+
+// Local Category definition to bypass stale Prisma Client types
+const Category = {
+    BEEF_BURGERS: 'BEEF_BURGERS',
+    STEAK_SANDWICHES: 'STEAK_SANDWICHES',
+    CHICKEN_BURGERS: 'CHICKEN_BURGERS',
+    FISH_BURGERS: 'FISH_BURGERS',
+    VEGGIE_BURGERS: 'VEGGIE_BURGERS',
+    ROLLS: 'ROLLS',
+    WRAPS: 'WRAPS',
+    HOT_FOOD: 'HOT_FOOD',
+    SALADS: 'SALADS',
+    SEAFOOD: 'SEAFOOD',
+    LOADED_FRIES: 'LOADED_FRIES',
+    CHICKEN_WINGS: 'CHICKEN_WINGS',
+    KIDS_MENU: 'KIDS_MENU',
+    SIDES: 'SIDES',
+    MILKSHAKES: 'MILKSHAKES',
+    SOFT_DRINKS: 'SOFT_DRINKS'
+} as const;
 
 const prisma = new PrismaClient();
 

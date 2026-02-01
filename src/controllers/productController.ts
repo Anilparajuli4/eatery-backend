@@ -65,7 +65,7 @@ export const updateProduct = async (req: Request, res: Response) => {
             if (data.stock !== undefined && data.stock !== currentProduct.stock) {
                 const stockDiff = data.stock - currentProduct.stock;
 
-                await tx.stockHistory.create({
+                await (tx as any).stockHistory.create({
                     data: {
                         productId: currentProduct.id,
                         change: stockDiff,
@@ -94,7 +94,7 @@ export const updateProduct = async (req: Request, res: Response) => {
                     lastRestocked: (data.stock !== undefined && data.stock > currentProduct.stock)
                         ? new Date()
                         : undefined // Prisma ignores undefined
-                }
+                } as any
             });
 
             return product;
