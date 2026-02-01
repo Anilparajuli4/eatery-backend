@@ -6,9 +6,28 @@ const productSchema = z.object({
     name: z.string(),
     description: z.string(),
     price: z.number().positive(),
-    category: z.enum(['BEEF_BURGERS', 'CHICKEN_BURGERS', 'SEAFOOD', 'LOADED_FRIES', 'SIDES', 'DRINKS']),
+    category: z.enum([
+        'BEEF_BURGERS',
+        'STEAK_SANDWICHES',
+        'CHICKEN_BURGERS',
+        'FISH_BURGERS',
+        'VEGGIE_BURGERS',
+        'ROLLS',
+        'WRAPS',
+        'HOT_FOOD',
+        'SALADS',
+        'SEAFOOD',
+        'LOADED_FRIES',
+        'CHICKEN_WINGS',
+        'KIDS_MENU',
+        'SIDES',
+        'MILKSHAKES',
+        'SOFT_DRINKS'
+    ]),
     image: z.string().optional(),
-    isAvailable: z.boolean().optional()
+    isAvailable: z.boolean().optional(),
+    stock: z.number().int().min(0).optional(),
+    lowStockThreshold: z.number().int().min(0).optional()
 });
 
 export const getProducts = async (req: Request, res: Response) => {
@@ -35,12 +54,55 @@ export const updateProduct = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const data = productSchema.partial().parse(req.body);
-        const product = await prisma.product.update({
-            where: { id: Number(id) },
-            data
+        const userId = (req as any).user?.id;
+
+        const result = await prisma.$transaction(async (tx) => {
+            // Get current product state
+            const currentProduct = await tx.product.findUnique({ where: { id: Number(id) } });
+            if (!currentProduct) throw new Error('Product not found');
+
+            // Check if stock is changing
+            if (data.stock !== undefined && data.stock !== currentProduct.stock) {
+                const stockDiff = data.stock - currentProduct.stock;
+
+                await tx.stockHistory.create({
+                    data: {
+                        productId: currentProduct.id,
+                        change: stockDiff,
+                        reason: 'MANUAL_ADJUSTMENT', // Or could be passed in body
+                        previousStock: currentProduct.stock,
+                        newStock: data.stock,
+                        userId: userId,
+                        notes: 'Updated via Admin Product Edit'
+                    }
+                });
+
+                // Update lastRestocked if stock increased
+                if (stockDiff > 0) {
+                    // We need to extend the type or just let prisma handle it if input allows
+                    // Ideally we should update the schema Zod definition if we want to pass it explicitly, 
+                    // but here we can just inject it into the update data or do it in the query.
+                    // The `data` object comes from zod parse, so we can't easily add properties if strict.
+                    // But prisma update `data` argument is flexible.
+                }
+            }
+
+            const product = await tx.product.update({
+                where: { id: Number(id) },
+                data: {
+                    ...data,
+                    lastRestocked: (data.stock !== undefined && data.stock > currentProduct.stock)
+                        ? new Date()
+                        : undefined // Prisma ignores undefined
+                }
+            });
+
+            return product;
         });
-        res.json(product);
+
+        res.json(result);
     } catch (error) {
+        console.error("Update Product Error:", error);
         res.status(400).json({ message: 'Error updating product' });
     }
 };

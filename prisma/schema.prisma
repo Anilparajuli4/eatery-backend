@@ -20,17 +20,20 @@ model User {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  price       Float
-  category    Category
-  image       String?
-  stock       Int      @default(0)
-  isAvailable Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  orderItems  OrderItem[]
+  id                Int            @id @default(autoincrement())
+  name              String
+  description       String
+  price             Float
+  category          Category
+  image             String?
+  stock             Int            @default(0)
+  lowStockThreshold Int            @default(10)
+  isAvailable       Boolean        @default(true)
+  lastRestocked     DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  orderItems        OrderItem[]
+  stockHistory      StockHistory[]
 }
 
 model Order {
@@ -65,6 +68,23 @@ model Setting {
   value String
 }
 
+model StockHistory {
+  id            Int      @id @default(autoincrement())
+  productId     Int
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  change        Int      // Positive for restock, negative for sale
+  reason        String   // "SALE", "RESTOCK", "ADJUSTMENT", "RETURN"
+  previousStock Int
+  newStock      Int
+  userId        Int?     // Admin who made the change
+  orderId       Int?     // If related to an order
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  @@index([productId])
+  @@index([createdAt])
+}
+
 enum Role {
   USER
   ADMIN
@@ -73,11 +93,21 @@ enum Role {
 
 enum Category {
   BEEF_BURGERS
+  STEAK_SANDWICHES
   CHICKEN_BURGERS
+  FISH_BURGERS
+  VEGGIE_BURGERS
+  ROLLS
+  WRAPS
+  HOT_FOOD
+  SALADS
   SEAFOOD
   LOADED_FRIES
+  CHICKEN_WINGS
+  KIDS_MENU
   SIDES
-  DRINKS
+  MILKSHAKES
+  SOFT_DRINKS
 }
 
 enum OrderStatus {

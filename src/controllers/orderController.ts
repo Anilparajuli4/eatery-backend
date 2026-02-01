@@ -25,13 +25,28 @@ export const createOrder = async (req: Request, res: Response) => {
         const { items, customerName, customerPhone, customerAddress } = orderSchema.parse(req.body);
         const userId = (req as any).user?.id; // Optional if guest checkout allowed
 
-        // Calculate total and formatted items
+        // Calculate total and formatted items with stock validation
         let total = 0;
         const formattedItems = [];
 
         for (const item of items) {
             const product = await prisma.product.findUnique({ where: { id: item.productId } });
             if (!product) throw new Error(`Product ${item.productId} not found`);
+
+            // Phase 1: Critical Stock Validation
+            if (product.stock < item.quantity) {
+                return res.status(400).json({
+                    message: `Insufficient stock for ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`,
+                    error: 'INSUFFICIENT_STOCK'
+                });
+            }
+
+            if (!product.isAvailable) {
+                return res.status(400).json({
+                    message: `${product.name} is currently unavailable`,
+                    error: 'PRODUCT_UNAVAILABLE'
+                });
+            }
 
             total += product.price * item.quantity;
             formattedItems.push({
@@ -51,6 +66,8 @@ export const createOrder = async (req: Request, res: Response) => {
             },
         });
 
+        // Create order but DON'T deduct stock yet (wait for payment)
+        // Optionally reservation could be done here, but simpler to check again at payment or use transactions
         const order = await prisma.order.create({
             data: {
                 userId,
@@ -85,7 +102,10 @@ export const createOrder = async (req: Request, res: Response) => {
 export const verifyPayment = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const order = await prisma.order.findUnique({ where: { id: Number(id) } });
+        const order = await prisma.order.findUnique({
+            where: { id: Number(id) },
+            include: { items: true }
+        });
 
         if (!order || !order.paymentId) {
             return res.status(404).json({ message: 'Order not found or invalid' });
@@ -94,25 +114,60 @@ export const verifyPayment = async (req: Request, res: Response) => {
         const paymentIntent = await stripe.paymentIntents.retrieve(order.paymentId);
 
         if (paymentIntent.status === 'succeeded') {
-            const updatedOrder = await prisma.order.update({
-                where: { id: order.id },
-                data: {
-                    paymentStatus: 'PAID',
-                    status: 'PREPARING' // Auto-move to preparing
-                },
-                include: { items: { include: { product: true } } }
+            // Use transaction to update order and deduct stock atomically
+            const result = await prisma.$transaction(async (tx) => {
+                // 1. Update Order Status
+                const updatedOrder = await tx.order.update({
+                    where: { id: order.id },
+                    data: {
+                        paymentStatus: 'PAID',
+                        status: 'PREPARING' // Auto-move to preparing
+                    },
+                    include: { items: { include: { product: true } } }
+                });
+
+                // 2. Deduct Stock for each item
+                for (const item of order.items) {
+                    const product = await tx.product.findUnique({ where: { id: item.productId } });
+                    if (!product) continue;
+
+                    const newStock = Math.max(0, product.stock - item.quantity);
+                    const isAvailable = newStock > 0;
+
+                    await tx.product.update({
+                        where: { id: item.productId },
+                        data: {
+                            stock: newStock,
+                            isAvailable: isAvailable
+                        }
+                    });
+
+                    // 3. Log Stock History
+                    await tx.stockHistory.create({
+                        data: {
+                            productId: item.productId,
+                            change: -item.quantity,
+                            reason: 'SALE',
+                            previousStock: product.stock,
+                            newStock: newStock,
+                            orderId: order.id
+                        }
+                    });
+                }
+
+                return updatedOrder;
             });
 
             // Notify Admins & Staff
             const io = (req as any).io;
-            io.to('admin_room').to('staff_room').emit('new_order', updatedOrder);
+            io.to('admin_room').to('staff_room').emit('new_order', result);
             io.to('admin_room').to('staff_room').emit('notification', {
                 title: 'New Order Received',
-                message: `Order #${updatedOrder.id} has been paid and is ready for preparation.`,
+                message: `Order #${result.id} has been paid and is ready for preparation.`,
                 type: 'ORDER_PAID'
             });
 
-            return res.json({ status: 'paid', order: updatedOrder });
+            return res.json({ status: 'paid', order: result });
         }
 
         res.json({ status: paymentIntent.status, order });

@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post('/register', register);
 router.post('/login', login);
-router.post('/google-login', googleLogin);
+router.post('/google', googleLogin);
+router.post('/google-login', googleLogin); // Keeping for legacy reference
 
 export default router;

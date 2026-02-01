@@ -65,24 +65,38 @@ export const login = async (req: Request, res: Response) => {
     }
 };
 
+import { OAuth2Client } from 'google-auth-library';
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 export const googleLogin = async (req: Request, res: Response) => {
     try {
-        // Mock Google user logic: find or create a user with a specific mock email
-        const mockEmail = 'google-user@example.com';
-        let user = await prisma.user.findUnique({ where: { email: mockEmail } });
+        const { token } = req.body;
+        if (!token) return res.status(400).json({ message: 'Token is required' });
+
+        // Get user info from Google using the access token
+        const googleRes = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`);
+        const googleUser = await googleRes.json();
+
+        if (!googleUser.email) {
+            return res.status(400).json({ message: 'Invalid token' });
+        }
+
+        const { email, name, sub: googleId } = googleUser;
+
+        let user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) {
             user = await prisma.user.create({
                 data: {
-                    email: mockEmail,
-                    password: 'google_mock_password', // Mock password, not used for login anyway
-                    name: 'Google User',
+                    email,
+                    password: bcrypt.hashSync(Math.random().toString(36), 10), // Random password for Google users
+                    name: name || email.split('@')[0],
                     role: 'USER'
                 }
             });
         }
 
-        const token = jwt.sign(
+        const jwtToken = jwt.sign(
             { id: user.id, email: user.email, role: user.role },
             process.env.JWT_SECRET as string,
             { expiresIn: '1h' }
@@ -90,11 +104,11 @@ export const googleLogin = async (req: Request, res: Response) => {
 
         res.json({
             message: 'Google login successful',
-            token,
+            token: jwtToken,
             user: { id: user.id, name: user.name, email: user.email, role: user.role }
         });
     } catch (error) {
-        console.error("Google Login Mock Error:", error);
-        res.status(500).json({ message: 'Server error' });
+        console.error("Google Login Error:", error);
+        res.status(500).json({ message: 'Server error during Google login' });
     }
 };

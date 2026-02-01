@@ -1,5 +1,6 @@
 import express from 'express';
 import { getStats } from '../controllers/statsController';
+import { getAnalytics } from '../controllers/analyticsController';
 import { getUsers, updateUser, deleteUser } from '../controllers/userController';
 import { authenticateToken, isAdmin } from '../middleware/auth';
 import { prisma } from '../server';
@@ -10,7 +11,9 @@ router.use(authenticateToken);
 router.use(isAdmin);
 
 // Stats
+// Stats
 router.get('/stats', getStats);
+router.get('/analytics', getAnalytics);
 
 // Users
 router.get('/users', getUsers);

@@ -12,7 +12,10 @@ const httpServer = createServer(app);
 const prisma = new PrismaClient();
 
 // Configure CORS
-const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+const rawFrontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+const frontendUrl = rawFrontendUrl.replace(/\/$/, ""); // Remove trailing slash
+
+console.log('Allowing CORS origin:', frontendUrl);
 
 const io = new Server(httpServer, {
     cors: {
@@ -27,6 +30,13 @@ app.use(cors({
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
 }));
+
+// Request Logger for Debugging
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - Origin: ${req.get('origin')}`);
+    next();
+});
+
 app.use(express.json());
 
 // Socket.io connection
@@ -72,11 +82,13 @@ import authRoutes from './routes/authRoutes';
 import productRoutes from './routes/productRoutes';
 import orderRoutes from './routes/orderRoutes';
 import paymentRoutes from './routes/paymentRoutes';
+import inventoryRoutes from './routes/inventoryRoutes';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 import statsRoutes from './routes/statsRoutes';
 app.use('/api/stats', statsRoutes);

@@ -15,8 +15,15 @@ const storage = new CloudinaryStorage({
     params: async (req, file) => {
         return {
             folder: 'bsquery-eater',
-            allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+            allowed_formats: ['webp', 'jpg', 'jpeg'],
+            format: 'webp', // Auto-convert to WebP for optimal size and quality
             public_id: `${Date.now()}-${file.originalname.split('.')[0]}`,
+            transformation: [
+                {
+                    quality: 'auto:good',
+                    fetch_format: 'auto'
+                }
+            ]
         };
     },
 });
