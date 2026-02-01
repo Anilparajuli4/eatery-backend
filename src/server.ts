@@ -13,23 +13,36 @@ const prisma = new PrismaClient();
 
 // Configure CORS
 const rawFrontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-const frontendUrl = rawFrontendUrl.replace(/\/$/, ""); // Remove trailing slash
+// Allow comma-separated origins from env, and remove trailing slashes
+const allowedOrigins = rawFrontendUrl.split(',').map(url => url.trim().replace(/\/$/, ""));
 
-console.log('Allowing CORS origin:', frontendUrl);
+console.log('Allowing CORS origins:', allowedOrigins);
 
-const io = new Server(httpServer, {
-    cors: {
-        origin: frontendUrl,
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-        credentials: true
-    }
-});
+const corsOptions = {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
 
-app.use(cors({
-    origin: frontendUrl,
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else if (origin.endsWith('.vercel.app') && (origin.includes('eatery') || origin.includes('anil-parajulis-projects'))) {
+            // Dynamically allow Vercel preview deployments
+            console.log('Allowing Vercel preview origin:', origin);
+            callback(null, true);
+        } else {
+            console.log('Blocked CORS origin:', origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
-}));
+};
+
+const io = new Server(httpServer, {
+    cors: corsOptions as any
+});
+
+app.use(cors(corsOptions as any));
 
 // Request Logger for Debugging
 app.use((req, res, next) => {
