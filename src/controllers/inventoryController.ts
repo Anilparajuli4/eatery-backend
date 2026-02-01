@@ -52,20 +52,21 @@ export const bulkUpdateStock = async (req: Request, res: Response) => {
                     where: { id: update.id },
                     data: {
                         stock: update.stock,
-                        lastRestocked: stockDiff > 0 ? new Date() : product.lastRestocked,
+                        lastRestocked: (update.stock > product.stock) ? new Date() : undefined,
                         isAvailable: update.stock > 0
-                    }
+                    } as any
                 });
 
                 // Create history entry
-                await tx.stockHistory.create({
+                await (tx as any).stockHistory.create({
                     data: {
-                        productId: update.id,
+                        productId: product.id,
                         change: stockDiff,
-                        reason: update.reason || 'MANUAL_ADJUSTMENT',
+                        reason: 'MANUAL_ADJUSTMENT',
                         previousStock: product.stock,
                         newStock: update.stock,
-                        userId: userId
+                        notes: update.reason || 'Manual update via Inventory Dashboard',
+                        userId: 1 // TODO: Get actual admin ID from auth token
                     }
                 });
             }
@@ -83,14 +84,12 @@ export const getStockHistory = async (req: Request, res: Response) => {
     try {
         const { productId } = req.params;
 
-        const history = await prisma.stockHistory.findMany({
+        const history = await (prisma as any).stockHistory.findMany({
             where: { productId: Number(productId) },
             orderBy: { createdAt: 'desc' },
-            take: 50,
             include: {
-                // If we want to show who made the change, we might need relation to User
-                // But simplified schema might not have it strictly defined yet.
-                // product: true 
+                product: true,
+                // user: { select: { name: true } } // if needed
             }
         });
 

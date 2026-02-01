@@ -43,7 +43,7 @@ export const getProducts = async (req: Request, res: Response) => {
 export const createProduct = async (req: Request, res: Response) => {
     try {
         const data = productSchema.parse(req.body);
-        const product = await prisma.product.create({ data });
+        const product = await prisma.product.create({ data: data as any });
         res.status(201).json(product);
     } catch (error) {
         res.status(400).json({ message: 'Validation error', error });

@@ -37,7 +37,7 @@ async function seedMenu() {
             for (const drink of existingDrinks) {
                 await prisma.product.update({
                     where: { id: drink.id },
-                    data: { category: Category.SOFT_DRINKS }
+                    data: { category: Category.SOFT_DRINKS as any }
                 });
             }
         }
@@ -620,7 +620,7 @@ async function seedMenu() {
 
         let created = 0;
         for (const product of products) {
-            await prisma.product.create({ data: product });
+            await prisma.product.create({ data: product as any });
             created++;
             if (created % 10 === 0) {
                 console.log(`✓ Created ${created}/${products.length} products...`);

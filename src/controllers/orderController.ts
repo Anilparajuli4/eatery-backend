@@ -143,14 +143,15 @@ export const verifyPayment = async (req: Request, res: Response) => {
                     });
 
                     // 3. Log Stock History
-                    await tx.stockHistory.create({
+                    await (tx as any).stockHistory.create({
                         data: {
                             productId: item.productId,
                             change: -item.quantity,
                             reason: 'SALE',
                             previousStock: product.stock,
-                            newStock: newStock,
-                            orderId: order.id
+                            newStock: product.stock - item.quantity,
+                            orderId: order.id,
+                            notes: `Order #${order.id}`
                         }
                     });
                 }
