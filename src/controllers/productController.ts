@@ -36,7 +36,11 @@ export const getProducts = async (req: Request, res: Response) => {
         res.json(products);
     } catch (error) {
         console.error("GET /api/products Error:", error);
-        res.status(500).json({ message: 'Error fetching products', error });
+        res.status(500).json({
+            message: 'Error fetching products',
+            error: error instanceof Error ? error.message : 'Unknown error',
+            details: error
+        });
     }
 };
 
