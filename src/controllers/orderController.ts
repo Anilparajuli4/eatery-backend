@@ -182,8 +182,16 @@ export const getOrders = async (req: Request, res: Response) => {
     try {
         const user = (req as any).user;
 
+        console.log('getOrders - User from token:', user);
+
+        if (!user) {
+            return res.status(401).json({ message: 'No user found in request' });
+        }
+
         // Admins and Staff see all orders, Users see their own
         const where = (user.role === 'ADMIN' || user.role === 'STAFF') ? {} : { userId: user.id };
+
+        console.log('getOrders - Querying with where:', where);
 
         const orders = await prisma.order.findMany({
             where,
@@ -191,10 +199,12 @@ export const getOrders = async (req: Request, res: Response) => {
             orderBy: { createdAt: 'desc' }
         });
 
+        console.log('getOrders - Found orders:', orders.length);
+
         res.json(orders);
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Error fetching orders' });
+        console.error("Error fetching orders:", error);
+        res.status(500).json({ message: 'Error fetching orders', error: String(error) });
     }
 };
 

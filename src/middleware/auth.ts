@@ -13,10 +13,21 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    if (!token) return res.sendStatus(401);
+    console.log('authenticateToken - Has auth header:', !!authHeader, 'Has token:', !!token);
+
+    if (!token) {
+        console.log('authenticateToken - No token provided');
+        return res.sendStatus(401);
+    }
+
+    console.log('authenticateToken - Verifying token with secret:', !!process.env.JWT_SECRET);
 
     jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
-        if (err) return res.sendStatus(401);
+        if (err) {
+            console.log('authenticateToken - Token verification failed:', err.message);
+            return res.sendStatus(401);
+        }
+        console.log('authenticateToken - User decoded:', user);
         req.user = user;
         next();
     });

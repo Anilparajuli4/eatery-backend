@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
@@ -137,6 +137,12 @@ app.use('/api/staff', staffRoutes);
 import path from 'path';
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Global error handler
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    console.error('Global error:', err);
+    res.status(500).json({ message: 'Internal server error', error: err.message });
+});
 
 const PORT = process.env.PORT || 4000;
 
