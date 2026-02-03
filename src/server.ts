@@ -25,9 +25,13 @@ const corsOptions = {
 
         if (allowedOrigins.includes(origin)) {
             callback(null, true);
-        } else if (origin.endsWith('.vercel.app') && (origin.includes('eatery') || origin.includes('anil-parajulis-projects'))) {
+        } else if (origin.endsWith('.vercel.app') && (origin.includes('eatery') || origin.includes('anil-parajulis-projects') || origin.includes('bsquery'))) {
             // Dynamically allow Vercel preview deployments
             console.log('Allowing Vercel preview origin:', origin);
+            callback(null, true);
+        } else if (origin.includes('localhost')) {
+            // Allow localhost for development
+            console.log('Allowing localhost origin:', origin);
             callback(null, true);
         } else {
             console.log('Blocked CORS origin:', origin);
@@ -35,7 +39,7 @@ const corsOptions = {
         }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
 };
 
 const io = new Server(httpServer, {
@@ -89,6 +93,18 @@ app.use((req, res, next) => {
 // Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
+});
+
+// Debug endpoint to check environment configuration
+app.get('/api/debug/config', (req, res) => {
+    res.json({
+        corsOrigins: allowedOrigins,
+        port: process.env.PORT,
+        hasJwtSecret: !!process.env.JWT_SECRET,
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+        hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+        nodeEnv: process.env.NODE_ENV
+    });
 });
 
 import authRoutes from './routes/authRoutes';
