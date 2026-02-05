@@ -16,7 +16,7 @@ export const getAnalytics = async (req: Request, res: Response) => {
         const orderItems = await prisma.orderItem.findMany({
             where: {
                 order: {
-                    status: 'COMPLETED'
+                    paymentStatus: 'PAID'
                 }
             },
             include: {
@@ -39,7 +39,7 @@ export const getAnalytics = async (req: Request, res: Response) => {
         // Fetch official Total Revenue from Order Total (Authoritative source matching Dashboard)
         const revenueAgg = await prisma.order.aggregate({
             _sum: { total: true },
-            where: { status: 'COMPLETED' }
+            where: { paymentStatus: 'PAID' }
         });
         const totalRevenue = revenueAgg._sum.total || 0;
 
@@ -111,7 +111,7 @@ export const getAnalytics = async (req: Request, res: Response) => {
         // 4. Weekly Performance (Best Days)
         const weeklyStats = await prisma.order.findMany({
             where: {
-                status: 'COMPLETED',
+                paymentStatus: 'PAID',
                 // Last 30 days to get a good average for "Best Days"
                 createdAt: { gte: new Date(new Date().setDate(today.getDate() - 30)) }
             },
@@ -163,11 +163,11 @@ export const getAnalytics = async (req: Request, res: Response) => {
         // Let's do a quick aggregate for accuracy
         const stripeRevenue = await prisma.order.aggregate({
             _sum: { total: true },
-            where: { paymentId: { not: null }, status: 'COMPLETED' }
+            where: { paymentId: { not: null }, paymentStatus: 'PAID' }
         });
         const cashRevenue = await prisma.order.aggregate({
             _sum: { total: true },
-            where: { paymentId: null, status: 'COMPLETED' } // Assuming null is cash/manual
+            where: { paymentId: null, paymentStatus: 'PAID' } // Assuming null is cash/manual
         });
 
         paymentMethods[0].amount = stripeRevenue._sum.total || 0;

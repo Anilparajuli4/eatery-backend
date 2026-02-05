@@ -9,9 +9,9 @@ const orderSchema = z.object({
     })),
     customerName: z.string().min(1, 'Name is required'),
     customerPhone: z.string().length(10, 'Phone must be exactly 10 digits').regex(/^[0-9]+$/, 'Phone must contain only numbers'),
-    customerAddress: z.string().min(5, 'Address is too short').refine(val => val.trim().split(/\s+/).length >= 2, {
-        message: 'Address must include at least two words (e.g., Street and City)'
-    })
+    customerAddress: z.string().optional(),
+    specialInstruction: z.string().optional(),
+    paymentMethod: z.string().optional()
 });
 
 import Stripe from 'stripe';
@@ -22,7 +22,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 export const createOrder = async (req: Request, res: Response) => {
     try {
-        const { items, customerName, customerPhone, customerAddress } = orderSchema.parse(req.body);
+        const { items, customerName, customerPhone, customerAddress, specialInstruction, paymentMethod } = orderSchema.parse(req.body);
         const userId = (req as any).user?.id; // Optional if guest checkout allowed
 
         // Calculate total and formatted items with stock validation
@@ -74,6 +74,8 @@ export const createOrder = async (req: Request, res: Response) => {
                 customerName,
                 customerPhone,
                 customerAddress,
+                specialInstruction,
+                paymentMethod: paymentMethod || 'STRIPE',
                 total,
                 status: 'PENDING',
                 paymentStatus: 'PENDING',

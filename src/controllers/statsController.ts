@@ -7,13 +7,15 @@ export const getStats = async (req: Request, res: Response) => {
         // Note: For now summing all orders, ideally filter by status 'COMPLETED' or 'PAID'
         const revenueAgg = await prisma.order.aggregate({
             _sum: { total: true },
-            where: { status: 'COMPLETED' }
+            where: { paymentStatus: 'PAID' }
         });
         const totalRevenue = revenueAgg._sum.total || 0;
 
         // 2. Total Orders
         const totalOrders = await prisma.order.count();
         const pendingOrders = await prisma.order.count({ where: { status: 'PENDING' } });
+        const preparingOrders = await prisma.order.count({ where: { status: 'PREPARING' } });
+        const readyOrders = await prisma.order.count({ where: { status: 'READY' } });
 
         // 3. Menu Items
         const totalProducts = await prisma.product.count();
@@ -37,7 +39,7 @@ export const getStats = async (req: Request, res: Response) => {
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
         const weeklyOrders = await prisma.order.findMany({
-            where: { createdAt: { gte: sevenDaysAgo }, status: 'COMPLETED' },
+            where: { createdAt: { gte: sevenDaysAgo }, paymentStatus: 'PAID' },
             select: { total: true, createdAt: true }
         });
 
@@ -89,6 +91,8 @@ export const getStats = async (req: Request, res: Response) => {
             revenue: totalRevenue,
             totalOrders,
             pendingOrders,
+            preparingOrders,
+            readyOrders,
             avgOrderValue: totalOrders > 0 ? totalRevenue / totalOrders : 0,
             menuItems: totalProducts,
             newMenuItems: newProducts,

@@ -1,0 +1,37 @@
+﻿node : Error: PrismaClientKnownRequestError: 
+At line:1 char:1
++ node debug-orders.js 2>&1 | Out-File -FilePath 
+error_debug.txt -Encod ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Erro 
+   r: PrismaClientKnownRequestError: :String) []  
+  , RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Invalid `prisma.order.findMany()` invocation in
+D:\bsquery-eater\backend\debug-orders.js:6:43
+
+  3 
+  4 async function main() {
+  5     try {
+ΓåÆ 6         const orders = await 
+prisma.order.findMany(
+The column `Order.specialInstruction` does not 
+exist in the current database.
+    at $n.handleRequestError (D:\bsquery-eater\bac
+kend\node_modules\@prisma\client\runtime\library.j
+s:121:7315)
+    at $n.handleAndLogRequestError (D:\bsquery-eat
+er\backend\node_modules\@prisma\client\runtime\lib
+rary.js:121:6623)
+    at $n.request (D:\bsquery-eater\backend\node_m
+odules\@prisma\client\runtime\library.js:121:6307)
+    at async l (D:\bsquery-eater\backend\node_modu
+les\@prisma\client\runtime\library.js:130:9633)
+    at async main 
+(D:\bsquery-eater\backend\debug-orders.js:6:24) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: { modelName: 'Order', column: 
+'Order.specialInstruction' }
+}
