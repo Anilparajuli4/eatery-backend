@@ -4,7 +4,8 @@ const prisma = new PrismaClient();
 async function main() {
     try {
         const orders = await prisma.order.findMany({
-            include: { items: true }
+            include: { items: { include: { product: true } } },
+            orderBy: { createdAt: 'desc' }
         });
         console.log("Total orders:", orders.length);
         const statusCounts = orders.reduce((acc, order) => {

@@ -184,29 +184,54 @@ export const getOrders = async (req: Request, res: Response) => {
     try {
         const user = (req as any).user;
 
-        console.log('getOrders - User from token:', user);
+        console.log('getOrders - User from token:', JSON.stringify(user));
 
         if (!user) {
             return res.status(401).json({ message: 'No user found in request' });
         }
 
         // Admins and Staff see all orders, Users see their own
-        const where = (user.role === 'ADMIN' || user.role === 'STAFF') ? {} : { userId: user.id };
+        // Ensure userId is a number to prevent Prisma type mismatches
+        let where = {};
+        if (user.role === 'ADMIN' || user.role === 'STAFF') {
+            where = {};
+        } else if (user.id) {
+            where = { userId: Number(user.id) };
+        } else {
+            // Guest or unknown user without ID — if allowed, this might be {}
+            // But usually we filter by userId if not admin/staff
+            console.log('getOrders - Non-admin/staff user with no ID');
+            where = { userId: null }; // Should return no orders if role is USER but no ID
+        }
 
-        console.log('getOrders - Querying with where:', where);
+        console.log('getOrders - Querying with where:', JSON.stringify(where));
 
         const orders = await prisma.order.findMany({
             where,
-            include: { items: { include: { product: true } } },
+            include: {
+                items: {
+                    include: {
+                        product: true
+                    }
+                }
+            },
             orderBy: { createdAt: 'desc' }
         });
 
         console.log('getOrders - Found orders:', orders.length);
 
         res.json(orders);
-    } catch (error) {
-        console.error("Error fetching orders:", error);
-        res.status(500).json({ message: 'Error fetching orders', error: String(error) });
+    } catch (error: any) {
+        console.error("CRITICAL ERROR FETCHING ORDERS:", error);
+
+        // Provide enough detail for debugging but keep it safe
+        const errorMessage = error instanceof Error ? error.message : String(error);
+
+        res.status(500).json({
+            message: 'Error fetching orders',
+            error: errorMessage,
+            code: error.code // Prisma error code if available
+        });
     }
 };
 
