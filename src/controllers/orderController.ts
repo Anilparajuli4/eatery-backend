@@ -22,18 +22,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 export const createOrder = async (req: Request, res: Response) => {
     try {
-        const { items, customerName, customerPhone, customerAddress, specialInstruction, paymentMethod } = orderSchema.parse(req.body);
-        const userId = (req as any).user?.id; // Optional if guest checkout allowed
+        const { items, customerName, customerPhone, customerAddress, specialInstruction, paymentMethod = 'STRIPE' } = orderSchema.parse(req.body);
+        const userId = (req as any).user?.id;
 
-        // Calculate total and formatted items with stock validation
+        // 1. Initial Stock Validation & Formatting
         let total = 0;
-        const formattedItems = [];
+        const formattedItems: { productId: number; quantity: number; price: number }[] = [];
 
         for (const item of items) {
             const product = await prisma.product.findUnique({ where: { id: item.productId } });
             if (!product) throw new Error(`Product ${item.productId} not found`);
 
-            // Phase 1: Critical Stock Validation
             if (product.stock < item.quantity) {
                 return res.status(400).json({
                     message: `Insufficient stock for ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`,
@@ -56,48 +55,114 @@ export const createOrder = async (req: Request, res: Response) => {
             });
         }
 
-        // Create Payment Intent
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(total * 100),
-            currency: 'usd',
-            description: `Order regarding food items for User ID: ${userId || 'Guest'}`,
-            automatic_payment_methods: {
-                enabled: true,
-            },
-        });
+        const isCash = paymentMethod.toUpperCase() === 'CASH';
 
-        // Create order but DON'T deduct stock yet (wait for payment)
-        // Optionally reservation could be done here, but simpler to check again at payment or use transactions
-        const order = await prisma.order.create({
-            data: {
-                userId,
-                customerName,
-                customerPhone,
-                customerAddress,
-                specialInstruction,
-                paymentMethod: paymentMethod || 'STRIPE',
-                total,
-                status: 'PENDING',
-                paymentStatus: 'PENDING',
-                paymentId: paymentIntent.id,
-                items: {
-                    create: formattedItems
+        if (isCash) {
+            // CASH FLOW: Create order and deduct stock immediately
+            const order = await prisma.$transaction(async (tx) => {
+                // Create Order
+                const newOrder = await tx.order.create({
+                    data: {
+                        userId,
+                        customerName,
+                        customerPhone,
+                        customerAddress,
+                        specialInstruction,
+                        paymentMethod: 'CASH',
+                        total,
+                        status: 'PENDING',
+                        paymentStatus: 'PENDING',
+                        items: {
+                            create: formattedItems
+                        }
+                    },
+                    include: { items: { include: { product: true } } }
+                });
+
+                // Deduct Stock
+                for (const item of formattedItems) {
+                    const product = await tx.product.findUnique({ where: { id: item.productId } });
+                    if (!product) continue;
+
+                    const newStock = Math.max(0, product.stock - item.quantity);
+                    await tx.product.update({
+                        where: { id: item.productId },
+                        data: {
+                            stock: newStock,
+                            isAvailable: newStock > 0
+                        }
+                    });
+
+                    // Log Stock History
+                    await (tx as any).stockHistory.create({
+                        data: {
+                            productId: item.productId,
+                            change: -item.quantity,
+                            reason: 'CASH_SALE_PENDING',
+                            previousStock: product.stock,
+                            newStock: newStock,
+                            orderId: newOrder.id,
+                            notes: `Cash Order #${newOrder.id} - Pending Payment`
+                        }
+                    });
                 }
-            },
-            include: { items: { include: { product: true } } }
-        });
+                return newOrder;
+            }, {
+                timeout: 20000 // 20 seconds
+            });
 
-        // Notify Admins & Staff via Socket
-        const io = (req as any).io;
-        io.to('admin_room').to('staff_room').emit('new_order', order);
+            // Notify Admins & Staff
+            const io = (req as any).io;
+            io.to('admin_room').to('staff_room').emit('new_order', order);
+            io.to('admin_room').to('staff_room').emit('notification', {
+                title: 'New Cash Order',
+                message: `Order #${order.id} for ${customerName} (Cash on Pickup)`,
+                type: 'NEW_ORDER'
+            });
 
-        res.status(201).json({
-            order,
-            clientSecret: paymentIntent.client_secret
-        });
-    } catch (error) {
+            return res.status(201).json({ order, clientSecret: null });
+        } else {
+            // STRIPE FLOW: Create Payment Intent, then Order
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: Math.round(total * 100),
+                currency: 'usd',
+                description: `Order regarding food items for User ID: ${userId || 'Guest'}`,
+                automatic_payment_methods: { enabled: true },
+            });
+
+            const order = await prisma.order.create({
+                data: {
+                    userId,
+                    customerName,
+                    customerPhone,
+                    customerAddress,
+                    specialInstruction,
+                    paymentMethod: paymentMethod || 'STRIPE',
+                    total,
+                    status: 'PENDING',
+                    paymentStatus: 'PENDING',
+                    paymentId: paymentIntent.id,
+                    items: {
+                        create: formattedItems
+                    }
+                },
+                include: { items: { include: { product: true } } }
+            });
+
+            const io = (req as any).io;
+            io.to('admin_room').to('staff_room').emit('new_order', order);
+
+            return res.status(201).json({
+                order,
+                clientSecret: paymentIntent.client_secret
+            });
+        }
+    } catch (error: any) {
         console.error("Order Creation Error:", error);
-        res.status(400).json({ message: 'Error creating order', error });
+        res.status(400).json({
+            message: 'Error creating order',
+            error: error.message || error
+        });
     }
 };
 
@@ -159,11 +224,17 @@ export const verifyPayment = async (req: Request, res: Response) => {
                 }
 
                 return updatedOrder;
+            }, {
+                timeout: 20000 // 20 seconds
             });
 
             // Notify Admins & Staff
             const io = (req as any).io;
             io.to('admin_room').to('staff_room').emit('new_order', result);
+
+            // Notify the specific order room (for real-time status update in user UI)
+            io.to(`order_${result.id}`).emit('order_status_update', result);
+
             io.to('admin_room').to('staff_room').emit('notification', {
                 title: 'New Order Received',
                 message: `Order #${result.id} has been paid and is ready for preparation.`,
@@ -183,25 +254,28 @@ export const verifyPayment = async (req: Request, res: Response) => {
 export const getOrders = async (req: Request, res: Response) => {
     try {
         const user = (req as any).user;
+        const { ids } = req.query;
 
-        console.log('getOrders - User from token:', JSON.stringify(user));
+        console.log('getOrders - User from token:', user ? JSON.stringify(user) : 'Guest');
 
-        if (!user) {
-            return res.status(401).json({ message: 'No user found in request' });
-        }
+        let where: any = {};
 
-        // Admins and Staff see all orders, Users see their own
-        // Ensure userId is a number to prevent Prisma type mismatches
-        let where = {};
-        if (user.role === 'ADMIN' || user.role === 'STAFF') {
-            where = {};
-        } else if (user.id) {
-            where = { userId: Number(user.id) };
+        if (user) {
+            if (user.role === 'ADMIN' || user.role === 'STAFF') {
+                where = {};
+            } else {
+                where = { userId: Number(user.id) };
+            }
+        } else if (ids) {
+            // Guest fetching specific orders they placed
+            const idArray = (ids as string).split(',').map(id => parseInt(id)).filter(id => !isNaN(id));
+            where = {
+                id: { in: idArray },
+                userId: null // Ensure they only get guest orders
+            };
         } else {
-            // Guest or unknown user without ID — if allowed, this might be {}
-            // But usually we filter by userId if not admin/staff
-            console.log('getOrders - Non-admin/staff user with no ID');
-            where = { userId: null }; // Should return no orders if role is USER but no ID
+            // Guest with no IDs provided — return empty to protect privacy
+            return res.json([]);
         }
 
         console.log('getOrders - Querying with where:', JSON.stringify(where));
@@ -249,7 +323,9 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
         // Notify User & Staff/Admins
         const io = (req as any).io;
 
-        // Notify the specific user
+        // Notify the specific user or guest session
+        io.to(`order_${order.id}`).emit('order_status_update', order);
+
         if (order.userId) {
             io.to(`user_${order.userId}`).emit('order_status_update', order);
 
@@ -268,5 +344,34 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
         res.json(order);
     } catch (error) {
         res.status(400).json({ message: 'Error updating order status' });
+    }
+};
+
+export const updatePaymentStatus = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { paymentStatus } = req.body;
+
+        const order = await prisma.order.update({
+            where: { id: Number(id) },
+            data: { paymentStatus },
+            include: { items: { include: { product: true } } }
+        });
+
+        // Notify Admins/Staff
+        const io = (req as any).io;
+        io.to('admin_room').to('staff_room').emit('order_updated', order);
+
+        // Notify the specific order room (for guests/logged-in users)
+        io.to(`order_${order.id}`).emit('order_status_update', order);
+
+        // Notify User if they are logged in
+        if (order.userId) {
+            io.to(`user_${order.userId}`).emit('order_status_update', order);
+        }
+
+        res.json(order);
+    } catch (error) {
+        res.status(400).json({ message: 'Error updating payment status' });
     }
 };
