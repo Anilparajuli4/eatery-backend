@@ -63,7 +63,7 @@ export const createOrder = async (req: Request, res: Response) => {
                 // Create Order
                 const newOrder = await tx.order.create({
                     data: {
-                        userId,
+                        userId: userId || null,
                         customerName,
                         customerPhone,
                         customerAddress,
@@ -132,7 +132,7 @@ export const createOrder = async (req: Request, res: Response) => {
 
             const order = await prisma.order.create({
                 data: {
-                    userId,
+                    userId: userId || null,
                     customerName,
                     customerPhone,
                     customerAddress,
@@ -260,21 +260,37 @@ export const getOrders = async (req: Request, res: Response) => {
 
         let where: any = {};
 
+        let idArray: number[] = [];
+        if (ids) {
+            if (Array.isArray(ids)) {
+                idArray = ids.map(id => parseInt(id as string)).filter(id => !isNaN(id));
+            } else {
+                idArray = (ids as string).split(',').map(id => parseInt(id)).filter(id => !isNaN(id));
+            }
+        }
+
         if (user) {
             if (user.role === 'ADMIN' || user.role === 'STAFF') {
                 where = {};
+            } else if (idArray.length > 0) {
+                where = {
+                    OR: [
+                        { userId: Number(user.id) },
+                        {
+                            id: { in: idArray },
+                            userId: null
+                        }
+                    ]
+                };
             } else {
                 where = { userId: Number(user.id) };
             }
-        } else if (ids) {
-            // Guest fetching specific orders they placed
-            const idArray = (ids as string).split(',').map(id => parseInt(id)).filter(id => !isNaN(id));
+        } else if (idArray.length > 0) {
             where = {
                 id: { in: idArray },
-                userId: null // Ensure they only get guest orders
+                userId: null
             };
         } else {
-            // Guest with no IDs provided — return empty to protect privacy
             return res.json([]);
         }
 
