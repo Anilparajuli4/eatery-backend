@@ -32,7 +32,9 @@ model Product {
   stock             Int            @default(0)
   lastRestocked     DateTime?
   lowStockThreshold Int            @default(10)
+  prepTime          Int            @default(15)
   orderItems        OrderItem[]
+  isPopular         Boolean        @default(false)
   stockHistory      StockHistory[]
 }
 

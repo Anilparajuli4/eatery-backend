@@ -27,24 +27,17 @@ async function seedMenu() {
     try {
         console.log('🌱 Starting menu seeding...\n');
 
-        // First, migrate any existing DRINKS products to SOFT_DRINKS
-        const existingDrinks = await prisma.product.findMany({
-            where: { category: 'DRINKS' as any }
-        });
+        // Legacy migration removed
 
-        if (existingDrinks.length > 0) {
-            console.log(`Migrating ${existingDrinks.length} products from DRINKS to SOFT_DRINKS...`);
-            for (const drink of existingDrinks) {
-                await prisma.product.update({
-                    where: { id: drink.id },
-                    data: { category: Category.SOFT_DRINKS as any }
-                });
-            }
-        }
+        // Clear existing related records to avoid foreign key constraints
+        console.log('Clearing existing orders and items...');
+        await prisma.stockHistory.deleteMany({});
+        await prisma.orderItem.deleteMany({});
+        await prisma.order.deleteMany({});
 
-        // Clear existing products (optional - comment out if you want to keep existing)
-        // await prisma.product.deleteMany({});
-        // console.log('Cleared existing products\n');
+        // Clear existing products
+        await prisma.product.deleteMany({});
+        console.log('Cleared existing products\n');
 
         const products = [
             // BEEF BURGERS
@@ -79,6 +72,8 @@ async function seedMenu() {
                 category: Category.BEEF_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                isPopular: true,
+                image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80'
             },
             {
                 name: 'Double Meat Stacker',
@@ -115,6 +110,8 @@ async function seedMenu() {
                 category: Category.CHICKEN_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                isPopular: true,
+                image: 'https://images.unsplash.com/photo-1525164286253-04e68b9d94bb?w=800&q=80'
             },
             {
                 name: 'Southern Heat',
@@ -131,6 +128,8 @@ async function seedMenu() {
                 category: Category.CHICKEN_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                isPopular: true,
+                image: 'https://images.unsplash.com/photo-1598182121876-59de571bc88b?w=800&q=80'
             },
             {
                 name: 'Loaded Grill',
@@ -147,6 +146,8 @@ async function seedMenu() {
                 category: Category.CHICKEN_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                isPopular: true,
+                image: 'https://images.unsplash.com/photo-1626700051175-656a4335c1a7?w=800&q=80'
             },
 
             // FISH BURGERS
@@ -379,6 +380,8 @@ async function seedMenu() {
                 category: Category.LOADED_FRIES,
                 stock: 999,
                 isAvailable: true,
+                isPopular: true,
+                image: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=800&q=80'
             },
             {
                 name: 'Peri-Peri Loaded Fries',
@@ -473,6 +476,8 @@ async function seedMenu() {
                 category: Category.SIDES,
                 stock: 999,
                 isAvailable: true,
+                isPopular: true,
+                image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800&q=80'
             },
             {
                 name: 'Chiko Rolls',
@@ -513,6 +518,8 @@ async function seedMenu() {
                 category: Category.SIDES,
                 stock: 999,
                 isAvailable: true,
+                isPopular: true,
+                image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=800&q=80'
             },
             {
                 name: 'Mozzarella Sticks',
@@ -521,6 +528,8 @@ async function seedMenu() {
                 category: Category.SIDES,
                 stock: 999,
                 isAvailable: true,
+                isPopular: true,
+                image: 'https://images.unsplash.com/photo-1531749964062-fce7a623a083?w=800&q=80'
             },
             {
                 name: 'Chicken Tenders',
@@ -616,11 +625,36 @@ async function seedMenu() {
             },
         ];
 
+        const CategoryImages: Record<string, string> = {
+            [Category.BEEF_BURGERS]: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&q=80',
+            [Category.CHICKEN_BURGERS]: 'https://images.unsplash.com/photo-1626700051175-656a4335c1a7?w=800&q=80',
+            [Category.STEAK_SANDWICHES]: 'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=800&q=80',
+            [Category.FISH_BURGERS]: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&q=80',
+            [Category.VEGGIE_BURGERS]: 'https://images.unsplash.com/photo-1584947844648-6d2c16139cdb?w=800&q=80',
+            [Category.ROLLS]: 'https://images.unsplash.com/photo-1541214113241-21578d2d9b62?w=800&q=80',
+            [Category.WRAPS]: 'https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=800&q=80',
+            [Category.HOT_FOOD]: 'https://images.unsplash.com/photo-1544333346-64e4fe1c26b6?w=800&q=80',
+            [Category.SALADS]: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80',
+            [Category.SEAFOOD]: 'https://images.unsplash.com/photo-1625944230945-1744a4693b3c?w=800&q=80',
+            [Category.LOADED_FRIES]: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=800&q=80',
+            [Category.CHICKEN_WINGS]: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=800&q=80',
+            [Category.KIDS_MENU]: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80',
+            [Category.SIDES]: 'https://images.unsplash.com/photo-1573806119324-da17cc86c63d?w=800&q=80',
+            [Category.MILKSHAKES]: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&q=80',
+            [Category.SOFT_DRINKS]: 'https://images.unsplash.com/photo-1527960471264-93ad9965a452?w=800&q=80'
+        };
+
         console.log(`Creating ${products.length} products...\n`);
 
         let created = 0;
         for (const product of products) {
-            await prisma.product.create({ data: product as any });
+            // Assign category image if not specifically provided
+            const productData = {
+                ...product,
+                image: (product as any).image || CategoryImages[product.category] || null
+            };
+
+            await prisma.product.create({ data: productData as any });
             created++;
             if (created % 10 === 0) {
                 console.log(`✓ Created ${created}/${products.length} products...`);
