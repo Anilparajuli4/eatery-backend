@@ -10,6 +10,10 @@ const orderSchema = z.object({
     customerName: z.string().min(1, 'Name is required'),
     customerPhone: z.string().length(10, 'Phone must be exactly 10 digits').regex(/^[0-9]+$/, 'Phone must contain only numbers'),
     customerAddress: z.string().optional(),
+    customerCity: z.string().optional(),
+    customerState: z.string().optional(),
+    customerPostalCode: z.string().optional(),
+    customerCountry: z.string().optional().default('IN'),
     specialInstruction: z.string().optional(),
     paymentMethod: z.string().optional()
 });
@@ -22,7 +26,18 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 export const createOrder = async (req: Request, res: Response) => {
     try {
-        const { items, customerName, customerPhone, customerAddress, specialInstruction, paymentMethod = 'STRIPE' } = orderSchema.parse(req.body);
+        const {
+            items,
+            customerName,
+            customerPhone,
+            customerAddress,
+            customerCity,
+            customerState,
+            customerPostalCode,
+            customerCountry,
+            specialInstruction,
+            paymentMethod = 'STRIPE'
+        } = orderSchema.parse(req.body);
         const userId = (req as any).user?.id;
 
         // 1. Initial Stock Validation & Formatting
@@ -123,11 +138,22 @@ export const createOrder = async (req: Request, res: Response) => {
             return res.status(201).json({ order, clientSecret: null });
         } else {
             // STRIPE FLOW: Create Payment Intent, then Order
+            // RBI Compliance: Stripe export transactions require customer name and address
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: Math.round(total * 100),
                 currency: 'usd',
                 description: `Order regarding food items for User ID: ${userId || 'Guest'}`,
                 automatic_payment_methods: { enabled: true },
+                shipping: {
+                    name: customerName,
+                    address: {
+                        line1: 'Pickup at Counter',
+                        city: 'Mumbai', // Default Indian city
+                        state: 'MH',
+                        postal_code: '400001',
+                        country: 'IN',
+                    }
+                }
             });
 
             const order = await prisma.order.create({
@@ -136,6 +162,10 @@ export const createOrder = async (req: Request, res: Response) => {
                     customerName,
                     customerPhone,
                     customerAddress,
+                    customerCity,
+                    customerState,
+                    customerPostalCode,
+                    customerCountry,
                     specialInstruction,
                     paymentMethod: paymentMethod || 'STRIPE',
                     total,
@@ -149,8 +179,8 @@ export const createOrder = async (req: Request, res: Response) => {
                 include: { items: { include: { product: true } } }
             });
 
-            const io = (req as any).io;
-            io.to('admin_room').to('staff_room').emit('new_order', order);
+            // Note: We DO NOT emit 'new_order' here for Stripe yet.
+            // It will be emitted in verifyPayment once payment is confirmed.
 
             return res.status(201).json({
                 order,
@@ -237,7 +267,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
 
             io.to('admin_room').to('staff_room').emit('notification', {
                 title: 'New Order Received',
-                message: `Order #${result.id} has been paid and is ready for preparation.`,
+                message: `Order #${result.id} for ${result.customerName} (Paid via Card)`,
                 type: 'ORDER_PAID'
             });
 

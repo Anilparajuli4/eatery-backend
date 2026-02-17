@@ -50,6 +50,10 @@ model Order {
   updatedAt          DateTime      @updatedAt
   paymentId          String?
   customerAddress    String?
+  customerCity       String?
+  customerState      String?
+  customerPostalCode String?
+  customerCountry    String? @default("IN")
   customerName       String?
   customerPhone      String?
   user               User?         @relation(fields: [userId], references: [id])
