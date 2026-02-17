@@ -43,11 +43,12 @@ async function seedMenu() {
             // BEEF BURGERS
             {
                 name: 'Smash Cheese Burger',
-                description: 'Beef patty, American Cheese, Caramelised onion, Tomato sauce and mustard',
+                description: '140 Gram Smashed Pure beef patty, American Cheese, Caramelised onion, Tomato sauce and mustard',
                 price: 10.00,
                 category: Category.BEEF_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1594212699903-ec8a3eea50f6?w=800&q=80'
             },
             {
                 name: 'Classic Aussie',
@@ -56,6 +57,7 @@ async function seedMenu() {
                 category: Category.BEEF_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80'
             },
             {
                 name: 'BSquare Crunch',
@@ -64,6 +66,7 @@ async function seedMenu() {
                 category: Category.BEEF_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&q=80'
             },
             {
                 name: 'The Lot Stacker',
@@ -73,33 +76,36 @@ async function seedMenu() {
                 stock: 999,
                 isAvailable: true,
                 isPopular: true,
-                image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80'
+                image: 'https://images.unsplash.com/photo-1607013251379-e6eecfffe234?w=800&q=80'
             },
             {
                 name: 'Double Meat Stacker',
-                description: '2x Beef patty, Bacon, Cheese & BSquare Sauce',
+                description: '2x (Beef patty, Bacon, Cheese) & BSquare Sauce',
                 price: 16.50,
                 category: Category.BEEF_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1586816001966-79b736744398?w=800&q=80'
             },
 
             // STEAK SANDWICHES
             {
                 name: 'Classic Aussie Steak Sando',
-                description: 'Steak, Lettuce, Tomato, Beetroot & Sauce (BBQ, Tomato, Garlic Aioli, BSquare)',
+                description: 'Steak, lettuce, tomato, beetroot & Sauce (BBQ, Tomato, Garlic Aioli, BSquare)',
                 price: 13.50,
                 category: Category.STEAK_SANDWICHES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&q=80'
             },
             {
                 name: 'Loaded Steak Sando',
-                description: 'Steak, Lettuce, Tomato, Caramelised Onion, Bacon, Egg, Cheese & Sauce (BBQ, Tomato, Garlic Aioli, BSquare)',
+                description: 'Steak, Lettuce, tomato, Caramelised Onion, bacon, egg, cheese & Sauce (BBQ, Tomato, Garlic Aioli, BSquare)',
                 price: 17.50,
                 category: Category.STEAK_SANDWICHES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=800&q=80'
             },
 
             // CHICKEN BURGERS
@@ -110,34 +116,34 @@ async function seedMenu() {
                 category: Category.CHICKEN_BURGERS,
                 stock: 999,
                 isAvailable: true,
-                isPopular: true,
-                image: 'https://images.unsplash.com/photo-1525164286253-04e68b9d94bb?w=800&q=80'
+                image: 'https://images.unsplash.com/photo-1626700051175-656a4335c1a7?w=800&q=80'
             },
             {
                 name: 'Southern Heat',
-                description: 'Crispy chicken, Cabbage Slaw, Pickles & BSquare mayo',
+                description: 'Crispy chicken, Cabbage Slaw, Pickles & Bsquare mayo',
                 price: 13.50,
                 category: Category.CHICKEN_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1598182121876-59de571bc88b?w=800&q=80'
             },
             {
                 name: 'Portuguese Grill',
-                description: 'Marinated Grill Chicken, Lettuce, Tomato, Onion, Cheese & BSquare mayo',
+                description: 'Marinated Grill Chicken, Lettuce, Tomato, Onion, Cheese & Bsquare mayo',
                 price: 15.50,
                 category: Category.CHICKEN_BURGERS,
                 stock: 999,
                 isAvailable: true,
-                isPopular: true,
-                image: 'https://images.unsplash.com/photo-1598182121876-59de571bc88b?w=800&q=80'
+                image: 'https://images.unsplash.com/photo-1598182121077-742894be6fc1?w=800&q=80'
             },
             {
                 name: 'Loaded Grill',
-                description: 'Marinated chicken, Lettuce, Tomato, Onion, Cheese, Bacon, Avo & Peri-Peri Sauce',
+                description: 'Marinated chicken, Lettuce, Tomato, Onion, cheese, Bacon, Avo & Peri-Peri Sauce',
                 price: 17.50,
                 category: Category.CHICKEN_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1512485694743-9c9538b4e6e0?w=800&q=80'
             },
             {
                 name: 'Smokey Chook',
@@ -146,18 +152,18 @@ async function seedMenu() {
                 category: Category.CHICKEN_BURGERS,
                 stock: 999,
                 isAvailable: true,
-                isPopular: true,
-                image: 'https://images.unsplash.com/photo-1626700051175-656a4335c1a7?w=800&q=80'
+                image: 'https://images.unsplash.com/photo-1525164286253-04e68b9d94bb?w=800&q=80'
             },
 
             // FISH BURGERS
             {
                 name: 'Crispy Fish',
-                description: 'Housemade Battered Fish, Lettuce, Tomato, Onion & Aioli',
+                description: 'Housemade Battered Fish, Lettuce, Tomato, onion & Aioli',
                 price: 14.50,
                 category: Category.FISH_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=800&q=80'
             },
             {
                 name: 'Calamari Crunch',
@@ -166,42 +172,47 @@ async function seedMenu() {
                 category: Category.FISH_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800&q=80'
             },
 
             // VEGGIE BURGERS
             {
                 name: 'Green Gold Halloumi',
-                description: 'Grilled Halloumi, Lettuce, Tomato, Onion, Roasted Capsicum, Avo, Pesto & Aioli',
+                description: 'Grilled Halloumi, Lettuce, Tomato, Onion, Roasted capsicum, Avo, Pesto & Aioli',
                 price: 15.50,
                 category: Category.VEGGIE_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1584947844648-6d2c16139cdb?w=800&q=80'
             },
             {
                 name: 'Veggie Magic',
-                description: 'Crispy housemade veggie patty, Lettuce, Tomato, Cheese & BSquare Sauce',
+                description: 'Crispy housemade veggie patty, Lettuce, Tomato, cheese & Bsquare Sauce',
                 price: 14.50,
                 category: Category.VEGGIE_BURGERS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1520072959219-c5956f675b42?w=800&q=80'
             },
 
             // ROLLS
             {
-                name: 'Bacon & Egg',
+                name: 'Bacon & Egg Roll',
                 description: 'Bacon, Egg & Sauce',
                 price: 10.00,
                 category: Category.ROLLS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1627375267339-3dc72886fdb4?w=800&q=80'
             },
             {
-                name: 'Mega Bacon & Egg',
+                name: 'Mega Bacon & Egg Roll',
                 description: 'Double Bacon, Double Egg, Cheese, Hashbrown & Sauce',
                 price: 15.00,
                 category: Category.ROLLS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1510346366100-8451b6bc9320?w=800&q=80'
             },
 
             // WRAPS
@@ -212,14 +223,16 @@ async function seedMenu() {
                 category: Category.WRAPS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1541214113241-21578d2d9b62?w=800&q=80'
             },
             {
                 name: 'Loaded Schnitzel Wrap',
-                description: 'Housemade chicken Schnitzel, Lettuce, Avo, Bacon, Cheese & Sweet Chilli Mayo',
+                description: 'Housemade chicken Schnitzel, Lettuce, Avo, Bacon, Cheese & Sweet Chilli mayo',
                 price: 15.50,
                 category: Category.WRAPS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=800&q=80'
             },
             {
                 name: 'Veggie Wrap',
@@ -228,124 +241,139 @@ async function seedMenu() {
                 category: Category.WRAPS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80'
             },
             {
                 name: 'Twister Wrap',
-                description: 'Crispy chicken, Spinach, Cheese, Avo & Peri-Peri Sauce',
+                description: 'Crispy chicken, Spinach, Cheese, Avo & Peri-peri Sauce',
                 price: 15.00,
                 category: Category.WRAPS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1606755456206-b25206cde27e?w=800&q=80'
             },
 
             // HOT FOOD
             {
                 name: 'Fried Rice',
-                description: 'Delicious fried rice',
+                description: 'Freshly made fried rice',
                 price: 9.50,
                 category: Category.HOT_FOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&q=80'
             },
             {
                 name: 'Lasagna',
-                description: 'Classic lasagna',
+                description: 'Traditional beef lasagna',
                 price: 9.50,
                 category: Category.HOT_FOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=800&q=80'
             },
             {
                 name: 'Baked Potato',
-                description: 'Baked potato with toppings',
+                description: 'Loaded baked potato',
                 price: 9.50,
                 category: Category.HOT_FOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1628151249767-e6f987d3a0f9?w=800&q=80'
             },
             {
                 name: 'Roasted Veges',
-                description: 'Roasted vegetables',
+                description: 'Seasonal roasted vegetables',
                 price: 9.50,
                 category: Category.HOT_FOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1592417817098-8fd3d9eb14a5?w=800&q=80'
             },
 
             // SALADS
             {
                 name: 'Chicken Avo Salad',
-                description: 'Fresh salad with chicken and avocado',
+                description: 'Grilled chicken with fresh avocado and mixed greens',
                 price: 7.50,
                 category: Category.SALADS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80'
             },
             {
                 name: 'Green Garden Salad',
-                description: 'Fresh garden salad',
+                description: 'Fresh mixed garden greens',
                 price: 7.50,
                 category: Category.SALADS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80'
             },
             {
-                name: 'Caesar Salad',
-                description: 'Classic Caesar salad',
+                name: 'Ceasar Salad',
+                description: 'Classic Caesar salad with parmesan and croutons',
                 price: 7.50,
                 category: Category.SALADS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=800&q=80'
             },
 
             // SEAFOOD
             {
                 name: 'Battered Fish',
-                description: 'Housemade battered fish',
+                description: 'Housemade battered fish fillet',
                 price: 11.00,
                 category: Category.SEAFOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&q=80'
             },
             {
                 name: 'Grilled Fish',
-                description: 'Lightly coated in flour',
+                description: 'Fresh grilled fish (lightly coated in flour)',
                 price: 11.00,
                 category: Category.SEAFOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&q=80'
             },
             {
-                name: 'Calamari Rings',
-                description: '3 pieces of calamari rings',
+                name: 'Calamari Rings (3 pcs)',
+                description: 'Three crispy calamari rings',
                 price: 7.50,
                 category: Category.SEAFOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800&q=80'
             },
             {
-                name: 'Prawn Cutlets',
-                description: '2 pieces of prawn cutlets',
+                name: 'Prawn Cutlets (2 pcs)',
+                description: 'Two succulent prawn cutlets',
                 price: 6.00,
                 category: Category.SEAFOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&q=80'
             },
             {
                 name: 'Fish Bites',
-                description: 'Crispy fish bites',
+                description: 'Crispy fish bites (per piece)',
                 price: 3.00,
                 category: Category.SEAFOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=800&q=80'
             },
             {
-                name: 'Fish & Chips Combo',
+                name: 'Fish & Chips Pack',
                 description: 'Choice of fish (Battered/Grilled) & Small Chips',
                 price: 15.50,
                 category: Category.SEAFOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1606990393282-36c9dd814035?w=800&q=80'
             },
             {
                 name: 'Seafood Basket',
@@ -354,14 +382,16 @@ async function seedMenu() {
                 category: Category.SEAFOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=800&q=80'
             },
             {
-                name: 'Fish, Chips & Salad Pack',
+                name: 'Fish, Chips and Salad Pack',
                 description: 'Choice of fish (Battered/Grilled), garden salad, Chips, lemon & tartar sauce',
                 price: 19.00,
                 category: Category.SEAFOOD,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1606990393282-36c9dd814035?w=800&q=80'
             },
 
             // LOADED FRIES
@@ -372,6 +402,7 @@ async function seedMenu() {
                 category: Category.LOADED_FRIES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=800&q=80'
             },
             {
                 name: 'BBQ Loaded Fries',
@@ -380,7 +411,6 @@ async function seedMenu() {
                 category: Category.LOADED_FRIES,
                 stock: 999,
                 isAvailable: true,
-                isPopular: true,
                 image: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=800&q=80'
             },
             {
@@ -390,239 +420,288 @@ async function seedMenu() {
                 category: Category.LOADED_FRIES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=800&q=80'
             },
 
             // CHICKEN WINGS
             {
                 name: 'BBQ Chicken Wings',
-                description: 'BBQ flavored chicken wings',
+                description: 'Juicy wings with BBQ sauce',
                 price: 7.00,
                 category: Category.CHICKEN_WINGS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=800&q=80'
             },
             {
                 name: 'Peri-Peri Chicken Wings',
-                description: 'Peri-Peri flavored chicken wings',
+                description: 'Spicy wings with Peri-Peri sauce',
                 price: 7.00,
                 category: Category.CHICKEN_WINGS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=800&q=80'
             },
             {
                 name: 'Buffalo Chicken Wings',
-                description: 'Buffalo flavored chicken wings',
+                description: 'Classic wings with Buffalo sauce',
                 price: 7.00,
                 category: Category.CHICKEN_WINGS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=800&q=80'
             },
 
             // KIDS MENU
             {
                 name: 'Kids Cheese Burger',
-                description: 'Kid-sized cheese burger',
+                description: 'Perfectly sized for kids',
                 price: 9.50,
                 category: Category.KIDS_MENU,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80'
             },
             {
                 name: 'Kids Chicken Crunch',
-                description: 'Kid-sized chicken burger',
+                description: 'Kid-friendly crispy chicken',
                 price: 9.50,
                 category: Category.KIDS_MENU,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80'
             },
             {
                 name: 'Kids Fish and Chips',
-                description: 'Kid-sized fish and chips',
+                description: 'Mini fish and chips portion',
                 price: 9.50,
                 category: Category.KIDS_MENU,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80'
             },
             {
                 name: 'Kids Nuggets and Chips',
-                description: 'Kid-sized nuggets and chips',
+                description: 'Classic chicken nuggets and chips',
                 price: 9.50,
                 category: Category.KIDS_MENU,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80'
             },
             {
                 name: 'Kids Chicken Wrap',
-                description: 'Kid-sized chicken wrap',
+                description: 'Healthy-sized chicken wrap',
                 price: 9.50,
                 category: Category.KIDS_MENU,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80'
             },
 
             // SIDES
             {
                 name: 'Chips - Small',
-                description: 'Small serving of chips',
+                description: 'Crispy golden chips (Small)',
                 price: 5.50,
                 category: Category.SIDES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800&q=80'
             },
             {
                 name: 'Chips - Large',
-                description: 'Large serving of chips',
+                description: 'Crispy golden chips (Large)',
                 price: 7.50,
                 category: Category.SIDES,
                 stock: 999,
                 isAvailable: true,
-                isPopular: true,
                 image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800&q=80'
             },
             {
-                name: 'Chiko Rolls',
-                description: 'Crispy chiko rolls',
-                price: 4.50,
-                category: Category.SIDES,
-                stock: 999,
-                isAvailable: true,
-            },
-            {
-                name: 'Spring Rolls',
-                description: 'Crispy spring rolls',
-                price: 4.50,
-                category: Category.SIDES,
-                stock: 999,
-                isAvailable: true,
-            },
-            {
-                name: 'Dim Sims',
-                description: 'Meat/Garlic/Veggie Dim Sims',
-                price: 2.50,
-                category: Category.SIDES,
-                stock: 999,
-                isAvailable: true,
-            },
-            {
-                name: 'Hash Browns',
-                description: 'Crispy hash browns',
-                price: 2.50,
-                category: Category.SIDES,
-                stock: 999,
-                isAvailable: true,
-            },
-            {
-                name: 'Chicken Nuggets',
-                description: '6 pieces of chicken nuggets',
-                price: 6.50,
-                category: Category.SIDES,
-                stock: 999,
-                isAvailable: true,
-                isPopular: true,
-                image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=800&q=80'
-            },
-            {
-                name: 'Mozzarella Sticks',
-                description: '3 pieces of mozzarella sticks',
+                name: 'Calamari (3pcs)',
+                description: 'Three crispy calamari rings',
                 price: 7.00,
                 category: Category.SIDES,
                 stock: 999,
                 isAvailable: true,
-                isPopular: true,
-                image: 'https://images.unsplash.com/photo-1531749964062-fce7a623a083?w=800&q=80'
+                image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800&q=80'
             },
             {
-                name: 'Chicken Tenders',
-                description: '3 pieces of chicken tenders',
+                name: 'Fish Bite',
+                description: 'One crispy fish bite',
+                price: 3.00,
+                category: Category.SIDES,
+                stock: 999,
+                isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=800&q=80'
+            },
+            {
+                name: 'Prawn Cutlets (2pcs)',
+                description: 'Two crispy prawn cutlets',
+                price: 6.00,
+                category: Category.SIDES,
+                stock: 999,
+                isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&q=80'
+            },
+            {
+                name: 'Chico Rolls',
+                description: 'Classic Australian Chico roll',
+                price: 4.50,
+                category: Category.SIDES,
+                stock: 999,
+                isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=800&q=80'
+            },
+            {
+                name: 'Spring Rolls',
+                description: 'Crispy vegetable spring rolls',
+                price: 4.50,
+                category: Category.SIDES,
+                stock: 999,
+                isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=800&q=80'
+            },
+            {
+                name: 'Dim Sims',
+                description: 'Meat/Garlic/Veggie choice',
+                price: 2.50,
+                category: Category.SIDES,
+                stock: 999,
+                isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&q=80'
+            },
+            {
+                name: 'Hashbrowns',
+                description: 'Crispy golden hashbrown',
+                price: 2.50,
+                category: Category.SIDES,
+                stock: 999,
+                isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1574969884448-fe5bce3d0d51?w=800&q=80'
+            },
+            {
+                name: 'Chicken Nuggets (6pcs)',
+                description: 'Six piece chicken nuggets',
+                price: 6.50,
+                category: Category.SIDES,
+                stock: 999,
+                isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=800&q=80'
+            },
+            {
+                name: 'Mozerella Sticks (3pcs)',
+                description: 'Three crispy mozzarella sticks',
+                price: 7.00,
+                category: Category.SIDES,
+                stock: 999,
+                isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1510629954389-c1e0da47d414?w=800&q=80'
+            },
+            {
+                name: 'Chicken Tenders (3pcs)',
+                description: 'Three juicy chicken tenders',
                 price: 7.50,
                 category: Category.SIDES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=800&q=80'
             },
             {
                 name: 'Housemade Schnitzel',
-                description: 'Housemade chicken schnitzel',
+                description: 'Large crispy housemade chicken schnitzel',
                 price: 8.50,
                 category: Category.SIDES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1510629954389-c1e0da47d414?w=800&q=80'
             },
             {
                 name: 'Crispy Boneless',
-                description: 'Crispy boneless chicken',
+                description: 'Boneless crispy chicken pieces',
                 price: 7.50,
                 category: Category.SIDES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=800&q=80'
             },
 
             // MILKSHAKES
             {
                 name: 'Vanilla Milkshake',
-                description: 'Classic vanilla milkshake',
+                description: 'Classic creamy vanilla',
                 price: 6.50,
                 category: Category.MILKSHAKES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&q=80'
             },
             {
                 name: 'Strawberry Milkshake',
-                description: 'Classic strawberry milkshake',
+                description: 'Fresh strawberry flavor',
                 price: 6.50,
                 category: Category.MILKSHAKES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&q=80'
             },
             {
                 name: 'Cookie n Cream Milkshake',
-                description: 'Cookie and cream milkshake',
+                description: 'Crushed cookies and cream',
                 price: 6.50,
                 category: Category.MILKSHAKES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&q=80'
             },
             {
                 name: 'Banana Milkshake',
-                description: 'Classic banana milkshake',
+                description: 'Sweet banana flavor',
                 price: 6.50,
                 category: Category.MILKSHAKES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&q=80'
             },
             {
                 name: 'Chocolate Milkshake',
-                description: 'Classic chocolate milkshake',
+                description: 'Rich chocolate flavor',
                 price: 6.50,
                 category: Category.MILKSHAKES,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&q=80'
             },
 
             // SOFT DRINKS
             {
                 name: 'Soft Drink Can',
-                description: '375ml can',
+                description: '375ml Cans',
                 price: 3.00,
                 category: Category.SOFT_DRINKS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=800&q=80'
             },
             {
-                name: 'Soft Drink Bottle',
-                description: '600ml bottle',
+                name: 'Soft Drink Bottle (600ml)',
+                description: '600ml Bottle',
                 price: 4.00,
                 category: Category.SOFT_DRINKS,
                 stock: 999,
                 isAvailable: true,
+                image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=800&q=80'
             },
             {
-                name: 'Soft Drink Large Bottle',
-                description: '1.25L bottle',
+                name: 'Soft Drink Bottle (1.25L)',
+                description: 'Large 1.25L Bottle',
                 price: 5.00,
                 category: Category.SOFT_DRINKS,
                 stock: 999,
                 isAvailable: true,
-            },
+                image: 'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=800&q=80'
+            }
         ];
 
         const CategoryImages: Record<string, string> = {
@@ -640,8 +719,8 @@ async function seedMenu() {
             [Category.CHICKEN_WINGS]: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=800&q=80',
             [Category.KIDS_MENU]: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80',
             [Category.SIDES]: 'https://images.unsplash.com/photo-1573806119324-da17cc86c63d?w=800&q=80',
-            [Category.MILKSHAKES]: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=800&q=80',
-            [Category.SOFT_DRINKS]: 'https://images.unsplash.com/photo-1527960471264-93ad9965a452?w=800&q=80'
+            [Category.MILKSHAKES]: 'https://images.unsplash.com/photo-1553787499-6f9133860012?w=800&q=80',
+            [Category.SOFT_DRINKS]: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=80'
         };
 
         console.log(`Creating ${products.length} products...\n`);
