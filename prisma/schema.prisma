@@ -36,6 +36,10 @@ model Product {
   orderItems        OrderItem[]
   isPopular         Boolean        @default(false)
   stockHistory      StockHistory[]
+
+  @@index([category])
+  @@index([isPopular])
+  @@index([name])
 }
 
 model Order {
